@@ -1,5 +1,3 @@
-// get all workout data from back-end
-
 fetch("/api/workouts/range")
   .then(response => {
     return response.json();
@@ -8,11 +6,8 @@ fetch("/api/workouts/range")
     populateChart(data);
   });
 
-
-API.getWorkoutsInRange()
-
-  function generatePalette() {
-    const arr = [
+function generatePalette() {
+  const arr = [
     "#003f5c",
     "#2f4b7c",
     "#665191",
@@ -32,12 +27,15 @@ API.getWorkoutsInRange()
   ]
 
   return arr;
-  }
+}
+
 function populateChart(data) {
   let durations = duration(data);
   let pounds = calculateTotalWeight(data);
   let workouts = workoutNames(data);
   const colors = generatePalette();
+
+  const xLabels = xLabel(data);
 
   let line = document.querySelector("#canvas").getContext("2d");
   let bar = document.querySelector("#canvas2").getContext("2d");
@@ -47,15 +45,7 @@ function populateChart(data) {
   let lineChart = new Chart(line, {
     type: "line",
     data: {
-      labels: [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday"
-      ],
+      labels: xLabels,
       datasets: [
         {
           label: "Workout Duration In Minutes",
@@ -95,15 +85,7 @@ function populateChart(data) {
   let barChart = new Chart(bar, {
     type: "bar",
     data: {
-      labels: [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ],
+      labels: xLabels,
       datasets: [
         {
           label: "Pounds",
@@ -151,7 +133,7 @@ function populateChart(data) {
       labels: workouts,
       datasets: [
         {
-          label: "Excercises Performed",
+          label: "Exercises Performed",
           backgroundColor: colors,
           data: durations
         }
@@ -160,7 +142,7 @@ function populateChart(data) {
     options: {
       title: {
         display: true,
-        text: "Excercises Performed"
+        text: "Durations"
       }
     }
   });
@@ -171,7 +153,7 @@ function populateChart(data) {
       labels: workouts,
       datasets: [
         {
-          label: "Excercises Performed",
+          label: "Exercises Performed",
           backgroundColor: colors,
           data: pounds
         }
@@ -180,7 +162,7 @@ function populateChart(data) {
     options: {
       title: {
         display: true,
-        text: "Excercises Performed"
+        text: "Weight"
       }
     }
   });
@@ -190,9 +172,7 @@ function duration(data) {
   let durations = [];
 
   data.forEach(workout => {
-    workout.exercises.forEach(exercise => {
-      durations.push(exercise.duration);
-    });
+    durations.push(workout.totalDuration);
   });
 
   return durations;
@@ -202,9 +182,7 @@ function calculateTotalWeight(data) {
   let total = [];
 
   data.forEach(workout => {
-    workout.exercises.forEach(exercise => {
-      total.push(exercise.weight);
-    });
+    total.push(workout.totalWeight);
   });
 
   return total;
@@ -214,10 +192,19 @@ function workoutNames(data) {
   let workouts = [];
 
   data.forEach(workout => {
-    workout.exercises.forEach(exercise => {
-      workouts.push(exercise.name);
-    });
+    if (workout.exerciseNames) {
+      workouts.push(...workout.exerciseNames);
+    }
   });
-  
   return workouts;
+}
+
+function xLabel(data) {
+  let labels = [];
+
+  data.forEach(day => {
+    labels.push(day.dayOfWeek);
+  });
+
+  return labels;
 }
