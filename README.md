@@ -1,4 +1,4 @@
-## dylanhulbert.github.io/homework-13
+## github.com/dylanhulbert/homework-13
 I created the contents of this repo as homework for my Bootcamp at UofO
 
 ## Homework 13: Fitness Tracker
